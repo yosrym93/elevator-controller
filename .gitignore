@@ -1,3 +1,5 @@
 *.pdsbak
 *.hex
 *.workspace
+*.vscode
+bin/*
