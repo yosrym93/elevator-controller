@@ -1,14 +1,17 @@
 #include "ElevatorController.h"
 #include "Arduino.h"
 
+#define LIFT_MOTOR_PIN1 10
+#define LIFT_MOTOR_PIN2 11
+#define LIFT_MOTOR_PIN3 12
+#define LIFT_MOTOR_PIN4 13
+
 void ElevatorController::init() {
     Serial.println("Initializing elevator controller");
 
-    state = IDLE;
+    state = GOING_UP;
     doorController.init();
-    liftController.init();
-
-    // TODO: initialize pins
+    liftController.init(LIFT_MOTOR_PIN1, LIFT_MOTOR_PIN2, LIFT_MOTOR_PIN3, LIFT_MOTOR_PIN4);
 }
 
 void ElevatorController::run() {
