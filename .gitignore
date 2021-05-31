@@ -1,2 +1,3 @@
 *.pdsbak
-*.with_bootloader.standard.hex
+*.hex
+*.workspace
