@@ -1,3 +1,6 @@
+#include "DoorController.h"
+#include "LiftController.h"
+
 class ElevatorController {
 private:
     enum State {
@@ -9,6 +12,8 @@ private:
     };
 
     State state;
+    DoorController doorController;
+    LiftController liftController;
 public:
     void init();
     void run();

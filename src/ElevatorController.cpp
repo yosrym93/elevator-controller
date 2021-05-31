@@ -3,27 +3,42 @@
 
 void ElevatorController::init() {
     Serial.println("Initializing elevator controller");
+
     state = IDLE;
+    doorController.init();
+    liftController.init();
 
     // TODO: initialize pins
 }
 
 void ElevatorController::run() {
+    bool  done;
     switch (state) {
         case IDLE:
-            // TODO
             break;
         case GOING_UP:
-            // TODO
+            done = liftController.moveUp();
+            if (done) {
+                state = IDLE;
+            }
             break;
         case GOING_DOWN:
-            // TODO
+            done = liftController.moveDown();
+            if (done) {
+                state = IDLE;
+            }
             break;
         case DOOR_OPENING:
-            // TODO
+            done = doorController.open();
+            if (done) {
+                state = IDLE;
+            }
             break;
         case DOOR_CLOSING:
-            // TODO
+            done = doorController.close();
+            if (done) {
+                state = IDLE;
+            }
             break;
     } 
 }
