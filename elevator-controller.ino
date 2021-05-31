@@ -10,5 +10,4 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   elevatorController.run();
-  Serial.println("Hello from the other side");
 }
