@@ -18,7 +18,7 @@ void StepperController::init(uint stepsPerRevolution, uint speed, uint pin1, uin
     this->currentPosition = 0;
     this->currentStep = 0;
     this->stepsPerRevolution = stepsPerRevolution;
-    this->stepDelay = 60L * 1000L / stepsPerRevolution / speed;
+    this->stepDelay = (60L * 1000L / stepsPerRevolution) / speed;
 }
 
 void StepperController::motorStep(bool isClockwise) {

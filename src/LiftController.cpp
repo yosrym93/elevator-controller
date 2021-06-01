@@ -2,7 +2,7 @@
 
 
 void LiftController::init(int motorPin1, int motorPin2, int motorPin3, int motorPin4) {
-    stepperController.init(STEPS_PER_REVOLUTION, RPM, motorPin1, motorPin2, motorPin3, motorPin4);
+    stepperController.init(LM_STEPS_PER_REVOLUTION, LM_RPM, motorPin1, motorPin2, motorPin3, motorPin4);
 }
 
 bool LiftController::moveUp() {
