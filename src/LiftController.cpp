@@ -1,5 +1,4 @@
 #include "LiftController.h"
-#include "Arduino.h"
 
 
 void LiftController::init(int motorPin1, int motorPin2, int motorPin3, int motorPin4) {

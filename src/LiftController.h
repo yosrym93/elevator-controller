@@ -1,3 +1,4 @@
+#pragma once
 #include "StepperController.h"
 
 #define STEPS_PER_REVOLUTION 90
