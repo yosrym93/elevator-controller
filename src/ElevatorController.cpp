@@ -9,7 +9,7 @@
 void ElevatorController::init() {
     Serial.println("Initializing elevator controller");
 
-    state = GOING_UP;
+    state = IDLE;
     doorController.init();
     liftController.init(LIFT_MOTOR_PIN1, LIFT_MOTOR_PIN2, LIFT_MOTOR_PIN3, LIFT_MOTOR_PIN4);
 }
