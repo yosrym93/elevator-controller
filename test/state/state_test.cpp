@@ -1,4 +1,5 @@
 #include <unity.h>
+#include <nextState.h>
 
 void test_example() {
     TEST_ASSERT_EQUAL(1, 1); // TODO: remove
