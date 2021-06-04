@@ -36,6 +36,7 @@ struct State {
 #define ZERO_STRUCT {0}
 
 template<size_t NumLevels>
-inline void nextState(Input<NumLevels> const* in, State<NumLevels> const* curr, State<NumLevels>* next) {
+inline State<NumLevels> nextState(Input<NumLevels> const* in, State<NumLevels> const* curr) {
     // TODO
+    return ZERO_STRUCT;
 }
