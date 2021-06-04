@@ -27,8 +27,8 @@ struct State {
     // remember the state of the buttons
     Bits<NumFloors> floorUpButtons, floorDownButtons, numpad;
 
-    // don't move if currentLevel == nextLevel
-    int currentLevel, nextLevel;
+    // don't move if currentFloor == nextFloor
+    int currentFloor, nextFloor;
 };
 
 // initial state is all zeroed out
