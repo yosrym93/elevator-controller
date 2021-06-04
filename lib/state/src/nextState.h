@@ -22,6 +22,10 @@ struct Input {
     Bits<NumFloors> numpad;
 };
 
+enum class Direction: uint8_t {
+    STOP = 0, UP, DOWN
+};
+
 template<uint8_t NumFloors>
 struct State {
     // remember the state of the buttons
@@ -29,6 +33,8 @@ struct State {
 
     // don't move if currentFloor == nextFloor
     uint8_t currentFloor, nextFloor;
+
+    Direction direction;
 };
 
 // initial state is all zeroed out
