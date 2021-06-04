@@ -175,6 +175,77 @@ void test_scenario_3(void) {
     TEST_ASSERT_EQUAL(0, st.numpad[0]);
 }
 
+void test_scenario_4(void) {
+    // if: elv on floor 4, 1 person on floor 1, push down
+    st.currentFloor = 4;
+    in.floorDownButtons[1] = in.doorsSensors[1] = 1;
+    st = nextState(&in, &st);
+    // then: floor 1 is next
+    TEST_ASSERT_EQUAL(1, st.currentFloor);
+    TEST_ASSERT_EQUAL(1, st.nextFloor);
+    // then: floorDownButtons[1] is on
+    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+
+    // if: elv on floor 3, person on floor 2, pushes up
+    st.currentFloor = 3;
+    in.floorUpButtons[2] = in.doorsSensors[2] = 1;
+    st = nextState(&in, &st);
+    // then: floor 1 is next
+    TEST_ASSERT_EQUAL(3, st.currentFloor);
+    TEST_ASSERT_EQUAL(1, st.nextFloor);
+    // then: floorUpButtons[2] is on
+    TEST_ASSERT_EQUAL(1, st.floorUpButtons[2]);
+    // then: floorDownButtons[1] is on
+    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+
+    // if: elv on floor 1, person goes on elevator, pushes 2
+    st.currentFloor = 1;
+    in.floorDownButtons[1] = in.doorsSensors[1] = 0;
+    in.numpad[2] = 1;
+    st = nextState(&in, &st);
+    // then: floor 2 is next
+    TEST_ASSERT_EQUAL(1, st.currentFloor);
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+    // then: floorUpButtons[2] is on
+    TEST_ASSERT_EQUAL(1, st.floorUpButtons[2]);
+    // then: floorDownButtons[1] is off
+    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    // then: numpad[2] is on
+    TEST_ASSERT_EQUAL(1, st.numpad[2]);
+
+    // if: elevator reaches floor 2, one goes in another goes out, pushes 4
+    st.currentFloor = 2;
+    in.floorUpButtons[2] = 0;
+    in.numpad[4] = 1;
+    st = nextState(&in, &st);
+    // then: floor 4 is next
+    TEST_ASSERT_EQUAL(2, st.currentFloor);
+    TEST_ASSERT_EQUAL(4, st.nextFloor);
+    // then: floorUpButtons[2] is off
+    TEST_ASSERT_EQUAL(0, st.floorUpButtons[2]);
+    // then: floorDownButtons[1] is off
+    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    // then: numpad[2] is off
+    TEST_ASSERT_EQUAL(0, st.numpad[2]);
+    // then: numpad[4] is on
+    TEST_ASSERT_EQUAL(1, st.numpad[4]);
+
+    // if: elv reaches floor 4, one goes out
+    st.currentFloor = 4;
+    st = nextState(&in, &st);
+    // then: elv stops
+    TEST_ASSERT_EQUAL(4, st.currentFloor);
+    TEST_ASSERT_EQUAL(4, st.nextFloor);
+    // then: floorUpButtons[2] is off
+    TEST_ASSERT_EQUAL(0, st.floorUpButtons[2]);
+    // then: floorDownButtons[1] is off
+    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    // then: numpad[2] is off
+    TEST_ASSERT_EQUAL(0, st.numpad[2]);
+    // then: numpad[4] is off
+    TEST_ASSERT_EQUAL(0, st.numpad[4]);
+}
+
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_zeroed);
@@ -182,6 +253,7 @@ int main() {
     RUN_TEST(test_scenario_1);
     RUN_TEST(test_scenario_2);
     RUN_TEST(test_scenario_3);
+    RUN_TEST(test_scenario_4);
     UNITY_END();
 
     return 0;
