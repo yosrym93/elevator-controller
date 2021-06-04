@@ -10,7 +10,8 @@ A generic Arduino controller that manages the operations of an elevator.
 ```bash
 $ sudo apt update &&
   sudo apt install -y g++ gcc python3-pip make &&
-  sudo python3 -m pip install platformio
+  sudo python3 -m pip install platformio &&
+  pio update
 ```
 
 # VSCode Integration
