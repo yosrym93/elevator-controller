@@ -1,9 +1,9 @@
 #include <unity.h>
 #include <nextState.h>
 
-constexpr size_t LEVELS = 5;
-State<LEVELS> st;
-Input<LEVELS> in;
+constexpr size_t NUM_FLOORS = 5;
+State<NUM_FLOORS> st;
+Input<NUM_FLOORS> in;
 
 void setUp(void) {
     st = ZERO_STRUCT;
@@ -25,10 +25,10 @@ void test_zeroed(void) {
 }
 
 void test_scenario_0(void) {
-    // if: 1 person on level 0, push up
+    // if: 1 person on floor 0, push up
     in.floorUpButtons[0] = in.doorsSensors[0] = 1;
     st = nextState(&in, &st);
-    // then: level 0 is next
+    // then: floor 0 is next
     TEST_ASSERT_EQUAL(0, st.currentLevel);
     TEST_ASSERT_EQUAL(0, st.nextLevel);
     // then: floorUpButton[0] is off
@@ -38,7 +38,7 @@ void test_scenario_0(void) {
     in.floorUpButtons[0] = in.doorsSensors[0] = 0;
     in.numpad[1] = 1;
     st = nextState(&in, &st);
-    // then: level 1 is next
+    // then: floor 1 is next
     TEST_ASSERT_EQUAL(0, st.currentLevel);
     TEST_ASSERT_EQUAL(1, st.nextLevel);
     // then: floorUpButton[0] is off
@@ -46,7 +46,7 @@ void test_scenario_0(void) {
     // then: numpad[1] is on
     TEST_ASSERT_EQUAL(1, st.numpad[1]);
 
-    // if: elevator reaches level 1
+    // if: elevator reaches floor 1
     st.currentLevel = 1;
     st = nextState(&in, &st);
     // then: elevator stops
@@ -59,10 +59,10 @@ void test_scenario_0(void) {
 }
 
 void test_scenario_1(void) {
-    // if: 2 persons on level 0, push up
+    // if: 2 persons on floor 0, push up
     in.floorUpButtons[0] = in.doorsSensors[0] = 1;
     st = nextState(&in, &st);
-    // then: level 0 is next
+    // then: floor 0 is next
     TEST_ASSERT_EQUAL(0, st.currentLevel);
     TEST_ASSERT_EQUAL(0, st.nextLevel);
     // then: floorUpButton[0] is off
@@ -73,7 +73,7 @@ void test_scenario_1(void) {
     in.doorsSensors[0] = 1;
     in.numpad[2] = 1;
     st = nextState(&in, &st);
-    // then: level 2 is next
+    // then: floor 2 is next
     TEST_ASSERT_EQUAL(0, st.currentLevel);
     TEST_ASSERT_EQUAL(2, st.nextLevel);
     // then: floorUpButton[0] is off
@@ -81,10 +81,10 @@ void test_scenario_1(void) {
     // then: numpad[2] is on
     TEST_ASSERT_EQUAL(1, st.numpad[2]);
 
-    // if: elevator reaches level 1
+    // if: elevator reaches floor 1
     st.currentLevel = 1;
     st = nextState(&in, &st);
-    // then: elevator continues to level 2
+    // then: elevator continues to floor 2
     TEST_ASSERT_EQUAL(1, st.currentLevel);
     TEST_ASSERT_EQUAL(2, st.nextLevel);
     // then: floorUpButton[0] is off
@@ -92,7 +92,7 @@ void test_scenario_1(void) {
     // then: numpad[2] is on
     TEST_ASSERT_EQUAL(1, st.numpad[2]);
 
-    // if: elevator reaches level 2
+    // if: elevator reaches floor 2
     st.currentLevel = 2;
     st = nextState(&in, &st);
     // then: elevator stops
@@ -105,21 +105,21 @@ void test_scenario_1(void) {
 }
 
 void test_scenario_2(void) {
-    // if: 1 person on level 1, push down
+    // if: 1 person on floor 1, push down
     in.floorDownButtons[1] = in.doorsSensors[1] = 1;
     st = nextState(&in, &st);
-    // then: level 1 is next
+    // then: floor 1 is next
     TEST_ASSERT_EQUAL(0, st.currentLevel);
     TEST_ASSERT_EQUAL(1, st.nextLevel);
     // then: keep floorUpButton[1]
     TEST_ASSERT_EQUAL(1, st.floorUpButtons[1]);
 
-    // if: elevator reached level 1, 1 person stepped in, pushes 3
+    // if: elevator reached floor 1, 1 person stepped in, pushes 3
     st.currentLevel = 1;
     in.floorDownButtons[1] = in.doorsSensors[1] = 0;
     in.numpad[3] = 1;
     st = nextState(&in, &st);
-    // then: level 3 is next
+    // then: floor 3 is next
     TEST_ASSERT_EQUAL(1, st.currentLevel);
     TEST_ASSERT_EQUAL(3, st.nextLevel);
     // then: floorUpButton[1] is off
@@ -127,7 +127,7 @@ void test_scenario_2(void) {
     // then: numpad[3] is on
     TEST_ASSERT_EQUAL(1, st.numpad[3]);
 
-    // if: elevator reaches level 3
+    // if: elevator reaches floor 3
     st.currentLevel = 3;
     st = nextState(&in, &st);
     // then: elevator stops

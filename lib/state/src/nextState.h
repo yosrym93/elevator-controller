@@ -13,19 +13,19 @@ using Bits = std::array<bool, N>;
 
 // assuming buttons are not sticky
 // Bi=1 as long as someone is pressing, otherwise Bi=0
-template<size_t NumLevels>
+template<size_t NumFloors>
 struct Input {
-    // every level has one floorUpButton + one floorDownButton + one door sensor
-    Bits<NumLevels> floorUpButtons, floorDownButtons, doorsSensors;
+    // every floor has one floorUpButton + one floorDownButton + one door sensor
+    Bits<NumFloors> floorUpButtons, floorDownButtons, doorsSensors;
 
     // numpad has buttons = #levels
-    Bits<NumLevels> numpad;
+    Bits<NumFloors> numpad;
 };
 
-template<size_t NumLevels>
+template<size_t NumFloors>
 struct State {
     // remember the state of the buttons
-    Bits<NumLevels> floorUpButtons, floorDownButtons, numpad;
+    Bits<NumFloors> floorUpButtons, floorDownButtons, numpad;
 
     // don't move if currentLevel == nextLevel
     int currentLevel, nextLevel;
@@ -35,8 +35,8 @@ struct State {
 // use it to declare state: State<N> s = ZERO_STRUCT;
 #define ZERO_STRUCT {0}
 
-template<size_t NumLevels>
-inline State<NumLevels> nextState(Input<NumLevels> const* in, State<NumLevels> const* curr) {
+template<size_t NumFloors>
+inline State<NumFloors> nextState(Input<NumFloors> const* in, State<NumFloors> const* curr) {
     // TODO
     return ZERO_STRUCT;
 }
