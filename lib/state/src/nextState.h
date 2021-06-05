@@ -95,6 +95,38 @@ uint8_t getIndexOfPrevHighBit(Bits<N> a, uint8_t i) {
     return i;
 }
 
+inline bool canMoveFromTo(uint8_t curFloor, uint8_t comFloor) {
+    return curFloor != comFloor;
+}
+
+// return one of [a,b,c,d] which has min dist to x
+inline uint8_t minDistance(uint8_t x, uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+    uint8_t choice = x;
+    int m = INT_MAX;
+    int arr[] = {a, b, c, d};
+
+    for (int i = 0; i < 4; i++) {
+        auto m2 = abs(int(x)-int(arr[i]));
+        if (m2 != 0 && m2 < m) {
+            m = m2;
+            choice = arr[i];
+        }
+    }
+
+    return choice;
+}
+
+// return first non zero distance to x in [a,b,c,d]
+inline uint8_t firstDistance(uint8_t x, uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+    int arr[] = {a, b, c, d};
+    for (int i = 0; i < 4; i++) {
+        if (arr[i] != x) {
+            return arr[i];
+        }
+    }
+    return x;
+}
+
 template<uint8_t NumFloors>
 State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) const {
     auto s = State<NumFloors> {
@@ -107,34 +139,28 @@ State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) c
         currentFloor: currentFloor,
     };
 
-    const auto toUpFloor = getIndexOfNextHighBit<NumFloors>(s.floorUpButtons, s.currentFloor);
-    const auto hasToGoUp = s.currentFloor != toUpFloor;
-    const auto toDownFloor = getIndexOfPrevHighBit<NumFloors>(s.floorDownButtons, s.currentFloor);
-    const auto hasToGoDown = s.currentFloor != toDownFloor;
+    // clear current floor from numpad and floor{Up/Down}Button
+    s.numpad[currentFloor] = 0;
+    s.floorUpButtons[currentFloor] = 0;
+    s.floorDownButtons[currentFloor] = 0;
+
+    const auto reqUp = OrBits<NumFloors>(s.numpad, s.floorUpButtons);
+    const auto nextUp   = getIndexOfNextHighBit<NumFloors>(reqUp, s.currentFloor);
+    const auto prevUp   = getIndexOfPrevHighBit<NumFloors>(reqUp, s.currentFloor);
+
+    const auto reqDown = OrBits<NumFloors>(s.numpad, s.floorDownButtons);
+    const auto nextDown = getIndexOfNextHighBit<NumFloors>(reqDown, s.currentFloor);
+    const auto prevDown = getIndexOfPrevHighBit<NumFloors>(reqDown, s.currentFloor);
 
     switch (const auto dir = getDirection()) {
     case Direction::UP:
-        if (hasToGoUp) {
-            s.nextFloor = toUpFloor;
-        } else {
-            s.nextFloor = toDownFloor;
-        }
+        s.nextFloor = firstDistance(s.currentFloor, nextUp, nextDown, prevUp, prevDown);
         break;
     case Direction::DOWN:
-        if (hasToGoDown) {
-            s.nextFloor = toDownFloor;
-        } else {
-            s.nextFloor = toUpFloor;
-        }
+        s.nextFloor = firstDistance(s.currentFloor, prevDown, prevUp, nextDown, nextUp);
         break;
     case Direction::STOP:
-        if (hasToGoUp && hasToGoDown) {
-            s.nextFloor = std::min(toUpFloor, toDownFloor);
-        } else if (hasToGoUp) {
-            s.nextFloor = toUpFloor;
-        } else {
-            s.nextFloor = toDownFloor;
-        }
+        s.nextFloor = minDistance(s.currentFloor, nextUp, nextDown, prevDown, prevUp);
         break;
     }
 
