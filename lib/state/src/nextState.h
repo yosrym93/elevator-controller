@@ -58,7 +58,7 @@ Direction State<NumFloors>::getDirection() const {
 }
 
 template<uint8_t N>
-Bits<N> OrBits(Bits<N> a, Bits<N> b) {
+Bits<N> OrBits(Bits<N> const& a, Bits<N> const& b) {
     Bits<N> c;
     for (uint8_t i = 0; i < N; i++) {
         c[i] = a[i] | b[i];
@@ -66,8 +66,77 @@ Bits<N> OrBits(Bits<N> a, Bits<N> b) {
     return c;
 }
 
+template<uint8_t N>
+Bits<N> AndBits(Bits<N> const& a, Bits<N> const& b) {
+    Bits<N> c;
+    for (uint8_t i = 0; i < N; i++) {
+        c[i] = a[i] & b[i];
+    }
+    return c;
+}
+
+template<uint8_t N>
+uint8_t getIndexOfNextHighBit(Bits<N> a, uint8_t i) {
+    for (int j = i+1; j < N; j++) {
+        if (a[j]) {
+            return j;
+        }
+    }
+    return i;
+}
+
+template<uint8_t N>
+uint8_t getIndexOfPrevHighBit(Bits<N> a, uint8_t i) {
+    for (int j = i-1; j >= 0; j--) {
+        if (a[j]) {
+            return j;
+        }
+    }
+    return i;
+}
+
 template<uint8_t NumFloors>
 State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) const {
-    // TODO
-    return ZERO_STRUCT;
+    auto s = State<NumFloors> {
+        // buttons = buttons | input->buttons & input->IR
+        // this way if no one in floor, the button state will be zero
+        floorUpButtons: AndBits<NumFloors>(OrBits<NumFloors>(floorUpButtons, input->floorUpButtons), input->doorsSensors),
+        floorDownButtons: AndBits<NumFloors>(OrBits<NumFloors>(floorDownButtons, input->floorDownButtons), input->doorsSensors),
+
+        numpad: OrBits<NumFloors>(numpad, input->numpad),
+        currentFloor: currentFloor,
+    };
+
+    const auto toUpFloor = getIndexOfNextHighBit<NumFloors>(s.floorUpButtons, s.currentFloor);
+    const auto hasToGoUp = s.currentFloor != toUpFloor;
+    const auto toDownFloor = getIndexOfPrevHighBit<NumFloors>(s.floorDownButtons, s.currentFloor);
+    const auto hasToGoDown = s.currentFloor != toDownFloor;
+
+    switch (const auto dir = getDirection()) {
+    case Direction::UP:
+        if (hasToGoUp) {
+            s.nextFloor = toUpFloor;
+        } else {
+            s.nextFloor = toDownFloor;
+        }
+        break;
+    case Direction::DOWN:
+        if (hasToGoDown) {
+            s.nextFloor = toDownFloor;
+        } else {
+            s.nextFloor = toUpFloor;
+        }
+        break;
+    case Direction::STOP:
+        if (hasToGoUp && hasToGoDown) {
+            s.nextFloor = std::min(toUpFloor, toDownFloor);
+        } else if (hasToGoUp) {
+            s.nextFloor = toUpFloor;
+        } else {
+            s.nextFloor = toDownFloor;
+        }
+        break;
+    }
+
+    return s;
 }

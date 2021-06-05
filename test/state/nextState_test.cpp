@@ -24,6 +24,82 @@ void test_or_bits(void) {
     }
 }
 
+void test_and_bits(void) {
+    const auto size = 9;
+    auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+    auto b         = Bits<size>{0,1,0, 1,0,0, 0,0,0};
+    auto expectedC = Bits<size>{0,0,0, 1,0,0, 0,0,0};
+
+    auto c = AndBits<size>(a, b);
+    for (int i = 0; i < size; i++) {
+        TEST_ASSERT_EQUAL(expectedC[i], c[i]);
+    }
+}
+
+void test_getIndexOfNextHighBit(void) {
+    {
+        const auto size = 9;
+        auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+        auto i = 2;
+        auto expectedI = 3;
+
+        auto actualI = getIndexOfNextHighBit<size>(a, i);
+        TEST_ASSERT_EQUAL(expectedI, actualI);
+    }
+
+    {
+        const auto size = 9;
+        auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+        auto i = 3;
+        auto expectedI = 6;
+
+        auto actualI = getIndexOfNextHighBit<size>(a, i);
+        TEST_ASSERT_EQUAL(expectedI, actualI);
+    }
+
+    {
+        const auto size = 9;
+        auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+        auto i = 7;
+        auto expectedI = 7;
+
+        auto actualI = getIndexOfNextHighBit<size>(a, i);
+        TEST_ASSERT_EQUAL(expectedI, actualI);
+    }
+}
+
+void test_getIndexOfPrevHighBit(void) {
+    {
+        const auto size = 9;
+        auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+        auto i = 2;
+        auto expectedI = 0;
+
+        auto actualI = getIndexOfPrevHighBit<size>(a, i);
+        TEST_ASSERT_EQUAL(expectedI, actualI);
+    }
+
+    {
+        const auto size = 9;
+        auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+        auto i = 4;
+        auto expectedI = 3;
+
+        auto actualI = getIndexOfPrevHighBit<size>(a, i);
+        TEST_ASSERT_EQUAL(expectedI, actualI);
+    }
+
+    {
+        const auto size = 9;
+        auto a         = Bits<size>{0,0,0, 1,0,0, 1,0,0};
+        auto i = 1;
+        auto expectedI = 1;
+
+        auto actualI = getIndexOfPrevHighBit<size>(a, i);
+        TEST_ASSERT_EQUAL(expectedI, actualI);
+    }
+}
+
 void setUp(void) {
     st = ZERO_STRUCT;
     in = ZERO_STRUCT;
@@ -338,6 +414,10 @@ void test_scenario_6(void) {
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_or_bits);
+    RUN_TEST(test_and_bits);
+    RUN_TEST(test_getIndexOfNextHighBit);
+    RUN_TEST(test_getIndexOfPrevHighBit);
+
     RUN_TEST(test_zeroed);
     RUN_TEST(test_scenario_0);
     RUN_TEST(test_scenario_1);
