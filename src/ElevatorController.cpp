@@ -1,23 +1,6 @@
 #include "ElevatorController.h"
 #include "Arduino.h"
 
-// PARAMETERS
-#define DOOR_WAIT_SECONDS 3
-
-// PINS
-#define US_PING_PIN 4
-#define US_ECHO_PIN 5
-
-#define DOOR_MOTOR_PIN1 6
-#define DOOR_MOTOR_PIN2 7
-#define DOOR_MOTOR_PIN3 8
-#define DOOR_MOTOR_PIN4 9
-
-#define LIFT_MOTOR_PIN1 10
-#define LIFT_MOTOR_PIN2 11
-#define LIFT_MOTOR_PIN3 12
-#define LIFT_MOTOR_PIN4 13
-
 void ElevatorController::init() {
     Serial.println("Initializing elevator controller");
 
@@ -31,7 +14,7 @@ void ElevatorController::run() {
     ioController.readFloorsInput();
     ioController.readElevatorNumpad();
     ioController.displayInput();
-    bool  done;
+    bool done;
     switch (state) {
         case IDLE:
             break;

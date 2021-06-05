@@ -1,18 +1,9 @@
 #pragma once
 #include <BitBool.h>
 
+#include "constants.h"
+
 #define Bits BitBool
-
-#define NumFloors   8
-#define FLOORS_REGISTERS_SIZE 8
-
-#define FLOORS_REGISTERS_CLOCK A0
-#define FLOORS_REGISTERS_LATCH A1
-#define FLOORS_UP_PIN A2
-#define FLOORS_DOWN_PIN A3
-#define FLOORS_IR_PIN A4
-
-#define ELEVATOR_NUMPAD_PIN A5
 
 #define Key_1 93        // Corresponding ADC value for key 1
 #define Key_2 171       // Corresponding ADC value for key 2
@@ -41,11 +32,11 @@ class IOController
     void disableFloorsInput();
 
 public:
-    Bits<NumFloors> floorsUpButton;
-    Bits<NumFloors> floorsDownButton;
-    Bits<NumFloors> floorsIRSensor;
+    Bits<NUM_FLOORS> floorsUpButton;
+    Bits<NUM_FLOORS> floorsDownButton;
+    Bits<NUM_FLOORS> floorsIRSensor;
     // TODO: Rememeber to reset this vector
-    Bits<NumFloors> elevatorNumpad;
+    Bits<NUM_FLOORS> elevatorNumpad;
 
     void init();
     void readFloorsInput();

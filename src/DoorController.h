@@ -1,12 +1,6 @@
 #pragma once
+#include "constants.h"
 #include "StepperController.h"
-
-#define DM_STEPS_PER_REVOLUTION 90
-#define DM_RPM 12
-#define OBSTALCE_DISTANCE_THRESHOLD_CM 200
-
-#define CLOSED_DOOR_STEP 0
-#define OPENED_DOOR_STEP DM_STEPS_PER_REVOLUTION/2
 
 class DoorController {
 private:

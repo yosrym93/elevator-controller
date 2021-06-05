@@ -1,8 +1,6 @@
 #pragma once
+#include "constants.h"
 #include "StepperController.h"
-
-#define LM_STEPS_PER_REVOLUTION 90
-#define LM_RPM 12
 
 class LiftController {
 private:
