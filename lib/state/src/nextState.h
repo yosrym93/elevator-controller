@@ -142,9 +142,11 @@ NextStopPlanningState<NumFloors> NextStopPlanningState<NumFloors>::getNextState(
     auto reqDown = OrBits<NumFloors>(AndBits<NumFloors>(OrBits<NumFloors>(this->reqDown, input->floorDownButtons), input->doorsSensors), numpad);
 
     // clear current floor from numpad and requested floors
-    numpad[currentFloor] = 0;
-    reqUp[currentFloor] = 0;
-    reqDown[currentFloor] = 0;
+    if (!isMoving) {
+        numpad[currentFloor] = 0;
+        reqUp[currentFloor] = 0;
+        reqDown[currentFloor] = 0;
+    }
 
     // next and prev requested floors
     const auto nextUp   = getIndexOfNextHighBit<NumFloors>(reqUp, currentFloor);
@@ -169,6 +171,7 @@ NextStopPlanningState<NumFloors> NextStopPlanningState<NumFloors>::getNextState(
         reqUp: reqUp,
         reqDown: reqDown,
         numpad: numpad,
+        isMoving: isMoving,
         currentFloor: currentFloor,
         nextFloor: nextFloor,
     };
