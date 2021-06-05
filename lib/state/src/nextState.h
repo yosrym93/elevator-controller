@@ -18,7 +18,7 @@ struct Input {
     // every floor has one floorUpButton + one floorDownButton + one door sensor
     Bits<NumFloors> floorUpButtons, floorDownButtons, doorsSensors;
 
-    // numpad has buttons = #levels
+    // numpad has buttons = #floors
     Bits<NumFloors> numpad;
 };
 
