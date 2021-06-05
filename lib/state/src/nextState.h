@@ -57,6 +57,15 @@ Direction State<NumFloors>::getDirection() const {
     return Direction::DOWN;
 }
 
+template<uint8_t N>
+Bits<N> OrBits(Bits<N> a, Bits<N> b) {
+    Bits<N> c;
+    for (uint8_t i = 0; i < N; i++) {
+        c[i] = a[i] | b[i];
+    }
+    return c;
+}
+
 template<uint8_t NumFloors>
 State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) const {
     // TODO

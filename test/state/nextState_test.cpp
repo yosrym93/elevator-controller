@@ -12,6 +12,18 @@ inline void updateAndCheckState(void) {
     TEST_ASSERT_EQUAL(_floor, st.currentFloor);
 }
 
+void test_or_bits(void) {
+    const auto size = 9;
+    auto a         = Bits<size>{1,0,0, 1,0,0, 1,0,0};
+    auto b         = Bits<size>{0,1,0, 1,0,0, 0,0,0};
+    auto expectedC = Bits<size>{1,1,0, 1,0,0, 1,0,0};
+
+    auto c = OrBits<size>(a, b);
+    for (int i = 0; i < size; i++) {
+        TEST_ASSERT_EQUAL(expectedC[i], c[i]);
+    }
+}
+
 void setUp(void) {
     st = ZERO_STRUCT;
     in = ZERO_STRUCT;
@@ -325,6 +337,7 @@ void test_scenario_6(void) {
 
 int main() {
     UNITY_BEGIN();
+    RUN_TEST(test_or_bits);
     RUN_TEST(test_zeroed);
     RUN_TEST(test_scenario_0);
     RUN_TEST(test_scenario_1);
