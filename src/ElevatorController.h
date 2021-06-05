@@ -7,20 +7,21 @@
 
 class ElevatorController {
 private:
-    enum State {
+    enum ElevatorState {
         IDLE,
         GOING_UP,
         GOING_DOWN,
         DOOR_OPENING,
         DOOR_WAITING,
         DOOR_CLOSING
-    };
+    } elevatorState;
 
-    State state;
+    NextStopPlanningState<NUM_FLOORS> nextStopPlanningState;
     DoorController doorController;
     LiftController liftController;
     IOController ioController;
 
+    uint8_t currentFloor;
     unsigned long doorWaitBeginningMillis;
 public:
     void init();
