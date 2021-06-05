@@ -485,7 +485,7 @@ void test_scenario_10(void) {
     TEST_ASSERT_EQUAL(4, st.nextFloor);
 
     // elv between 2,3
-    st.currentFloor = 3;
+    st.currentFloor = 2;
     st.isMoving = 1;
     // person on floor 2
     in.doorsSensors[2] = 1;
@@ -516,6 +516,73 @@ void test_scenario_10(void) {
     TEST_ASSERT_EQUAL(1, st.numpad[0]);
 }
 
+void test_scenario_11(void) {
+    // person on floor 1
+    in.doorsSensors[1] = 1;
+    // pushed up
+    in.floorUpButtons[1] = 1;
+    // person on floor 2
+    in.doorsSensors[2] = 1;
+    // pushed up
+    in.floorUpButtons[2] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(1, st.nextFloor);
+
+    // elv going to floor 1
+    st.currentFloor = 0;
+    st.isMoving = 1;
+    // person on floor 1
+    in.doorsSensors[1] = 1;
+    // person on floor 2
+    in.doorsSensors[2] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(1, st.nextFloor);
+
+    // elv in floor 1
+    st.currentFloor = 1;
+    st.isMoving = 0;
+    // person goes on, pushes 3
+    in.numpad[3] = 1;
+    // person on floor 2
+    in.doorsSensors[2] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+    TEST_ASSERT_EQUAL(1, st.numpad[3]);
+
+    // elv going to floor 2
+    st.currentFloor = 1;
+    st.isMoving = 1;
+    // person on floor 2
+    in.doorsSensors[2] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+    TEST_ASSERT_EQUAL(1, st.numpad[3]);
+
+    // elv in floor 2
+    st.currentFloor = 2;
+    st.isMoving = 0;
+    // person goes on pushes 4
+    in.numpad[4] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(3, st.nextFloor);
+    TEST_ASSERT_EQUAL(1, st.numpad[3]);
+    TEST_ASSERT_EQUAL(1, st.numpad[4]);
+
+    // elv in floor 3
+    st.currentFloor = 3;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(4, st.nextFloor);
+    TEST_ASSERT_EQUAL(0, st.numpad[3]);
+    TEST_ASSERT_EQUAL(1, st.numpad[4]);
+
+    // elv in floor 4
+    st.currentFloor = 4;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(4, st.nextFloor);
+    TEST_ASSERT_EQUAL(0, st.numpad[3]);
+    TEST_ASSERT_EQUAL(0, st.numpad[4]);
+}
+
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_or_bits);
@@ -535,6 +602,7 @@ int main() {
     RUN_TEST(test_scenario_8);
     RUN_TEST(test_scenario_9);
     RUN_TEST(test_scenario_10);
+    RUN_TEST(test_scenario_11);
     UNITY_END();
 
     return 0;
