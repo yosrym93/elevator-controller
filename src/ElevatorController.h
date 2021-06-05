@@ -10,9 +10,9 @@ private:
     enum ElevatorState {
         // The elevator is IDLE at a floor with the door opened at the currentFloor.
         IDLE,
-        // The elevator is moving up toward the currentFloor.
+        // The elevator is moving up from the currentFloor.
         GOING_UP,
-        // The elevator is moving down toward the currentFloor.
+        // The elevator is moving down from the currentFloor.
         GOING_DOWN,
         // The elevator door is being opened.
         DOOR_OPENING,

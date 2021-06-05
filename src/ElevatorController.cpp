@@ -38,6 +38,7 @@ void ElevatorController::run() {
             // to check whether we need to continue moving up.
             bool arrivedAtNextFloor = liftController.moveUp();
             if (arrivedAtNextFloor) {
+                nextStopPlanningState.currentFloor++;
                 elevatorState = DOOR_CLOSED_AT_FLOOR;
             }
             break;
@@ -48,6 +49,7 @@ void ElevatorController::run() {
             // to check whether we need to continue moving down.
             bool arrivedAtNextFloor = liftController.moveDown();
             if (arrivedAtNextFloor) {
+                nextStopPlanningState.currentFloor--;
                 elevatorState = DOOR_CLOSED_AT_FLOOR;
             }
             break;
@@ -95,12 +97,10 @@ void ElevatorController::run() {
             if (nextStopPlanningState.nextFloor < nextStopPlanningState.currentFloor) {
                 // Need to go further down.
                 nextStopPlanningState.isMoving = true;
-                nextStopPlanningState.currentFloor--;
                 elevatorState = GOING_DOWN;
             } else if (nextStopPlanningState.nextFloor > nextStopPlanningState.currentFloor) {
                 // Need to go further up.
                 nextStopPlanningState.isMoving = true;
-                nextStopPlanningState.currentFloor++;
                 elevatorState = GOING_UP;
             } else {
                 // Arrived at the destination.
