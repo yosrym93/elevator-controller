@@ -20,17 +20,15 @@ private:
         DOOR_WAITING,
         // The elevator door is being closed.
         DOOR_CLOSING,
-        // The elevator is at the currentFloor with the door closed.
-        // The elevator will either open its doors if it reached its destination, or continue moving.
-        DOOR_CLOSED_AT_FLOOR,
     } elevatorState;
 
     NextStopPlanningState<NUM_FLOORS> nextStopPlanningState;
     DoorController doorController;
     LiftController liftController;
     IOController ioController;
-
     unsigned long doorWaitBeginningMillis;
+
+    void onFloorReached();
 public:
     void init();
     void run();

@@ -13,10 +13,9 @@ void ElevatorController::init() {
 
 void ElevatorController::run() {
     // Read inputs and update the next stop planning state, which may change our destination.
-    delay(500);
     auto input = ioController.readInput();
     nextStopPlanningState = nextStopPlanningState.getNextState(&input);
-    ioController.displayInput();
+    //ioController.displayInput();
     Serial.print("Current floor: ");
     Serial.print(nextStopPlanningState.currentFloor);
     Serial.print(" , Next floor: ");
@@ -39,7 +38,7 @@ void ElevatorController::run() {
             bool arrivedAtNextFloor = liftController.moveUp();
             if (arrivedAtNextFloor) {
                 nextStopPlanningState.currentFloor++;
-                elevatorState = DOOR_CLOSED_AT_FLOOR;
+                onFloorReached();
             }
             break;
         }
@@ -50,7 +49,7 @@ void ElevatorController::run() {
             bool arrivedAtNextFloor = liftController.moveDown();
             if (arrivedAtNextFloor) {
                 nextStopPlanningState.currentFloor--;
-                elevatorState = DOOR_CLOSED_AT_FLOOR;
+                onFloorReached();
             }
             break;
         }
@@ -78,36 +77,35 @@ void ElevatorController::run() {
         }
         case DOOR_CLOSING: {
             Serial.println("DOOR_CLOSING");
-        // Keep closing the door until it is fully closing, then move to DOOR_CLOSED_AT_FLOOR state
-        // to check whether we should move up or down (or neither if the call is cancelled).
+            // Keep closing the door until it is fully closing, then move to DOOR_CLOSED_AT_FLOOR state
+            // to check whether we should move up or down (or neither if the call is cancelled).
             if (doorController.checkObstacles()) {
                 // Open the door if an obstacle is detected.
                 elevatorState = DOOR_OPENING;
             }
             bool done = doorController.close();
             if (done) {
-                elevatorState = DOOR_CLOSED_AT_FLOOR;
-            }
-            break;
-        }
-        case DOOR_CLOSED_AT_FLOOR: {
-            Serial.println("DOOR_CLOSED_AT_FLOOR");
-            // The elevator arrived at the currentFloor, check whether we need to keep moving
-            // or this is our destination.
-            if (nextStopPlanningState.nextFloor < nextStopPlanningState.currentFloor) {
-                // Need to go further down.
-                nextStopPlanningState.isMoving = true;
-                elevatorState = GOING_DOWN;
-            } else if (nextStopPlanningState.nextFloor > nextStopPlanningState.currentFloor) {
-                // Need to go further up.
-                nextStopPlanningState.isMoving = true;
-                elevatorState = GOING_UP;
-            } else {
-                // Arrived at the destination.
-                nextStopPlanningState.isMoving = false;
-                elevatorState = DOOR_OPENING;
+                // Once the door closes in the currentFloor, the behavior is the same as reaching a floor
+                // while moving.
+                onFloorReached();
             }
             break;
         }
     } 
+}
+
+void ElevatorController::onFloorReached() {
+    if (nextStopPlanningState.nextFloor < nextStopPlanningState.currentFloor) {
+        // Need to go further down.
+        nextStopPlanningState.isMoving = true;
+        elevatorState = GOING_DOWN;
+    } else if (nextStopPlanningState.nextFloor > nextStopPlanningState.currentFloor) {
+        // Need to go further up.
+        nextStopPlanningState.isMoving = true;
+        elevatorState = GOING_UP;
+    } else {
+        // Arrived at the destination.
+        nextStopPlanningState.isMoving = false;
+        elevatorState = DOOR_OPENING;
+    }
 }
