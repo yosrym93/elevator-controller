@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits.h>
+#include <stdlib.h>
 
 #ifdef UNIT_TEST
 #include <array>
