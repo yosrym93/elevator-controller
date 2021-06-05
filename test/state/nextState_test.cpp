@@ -108,10 +108,10 @@ void setUp(void) {
 void test_zeroed(void) {
     TEST_ASSERT_EQUAL(0, st.currentFloor);
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    for (auto i : st.floorDownButtons) {
+    for (auto i : st.reqDown) {
         TEST_ASSERT_EQUAL(0, i);
     }
-    for (auto i : st.floorUpButtons) {
+    for (auto i : st.reqUp) {
         TEST_ASSERT_EQUAL(0, i);
     }
     for (auto i : st.numpad) {
@@ -126,7 +126,7 @@ void test_scenario_0(void) {
     in.floorUpButtons[0] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
 
     // person goes on elv
     in.floorUpButtons[0] = in.doorsSensors[0] = 0;
@@ -134,14 +134,14 @@ void test_scenario_0(void) {
     in.numpad[1] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
     TEST_ASSERT_EQUAL(1, st.numpad[1]);
 
     // elv reaches floor 1
     st.currentFloor = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
     TEST_ASSERT_EQUAL(0, st.numpad[1]);
 }
 
@@ -152,7 +152,7 @@ void test_scenario_1(void) {
     in.floorUpButtons[0] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
 
     // 1 person goes on elv
     in.floorUpButtons[0] = 0;
@@ -162,21 +162,21 @@ void test_scenario_1(void) {
     in.numpad[2] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
     TEST_ASSERT_EQUAL(1, st.numpad[2]);
 
     // elv reaches floor 1
     st.currentFloor = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
     TEST_ASSERT_EQUAL(1, st.numpad[2]);
 
     // elv reaches floor 2
     st.currentFloor = 2;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[0]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[0]);
     TEST_ASSERT_EQUAL(0, st.numpad[2]);
 }
 
@@ -187,7 +187,7 @@ void test_scenario_2(void) {
     in.floorDownButtons[1] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
 
     // elv reached floor 1
     st.currentFloor = 1;
@@ -198,14 +198,14 @@ void test_scenario_2(void) {
     in.numpad[3] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(3, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(1, st.numpad[3]);
 
     // elv reaches floor 3
     st.currentFloor = 3;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(3, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(0, st.numpad[3]);
 }
 
@@ -218,7 +218,7 @@ void test_scenario_3(void) {
     in.floorDownButtons[1] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
 
     // elv on floor 1
     st.currentFloor = 1;
@@ -229,14 +229,14 @@ void test_scenario_3(void) {
     in.numpad[0] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(1, st.numpad[0]);
 
     // elv reaches floor 0
     st.currentFloor = 0;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(0, st.numpad[0]);
 }
 
@@ -249,7 +249,7 @@ void test_scenario_4(void) {
     in.floorDownButtons[1] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
 
     // elv on floor 3
     st.currentFloor = 3;
@@ -259,8 +259,8 @@ void test_scenario_4(void) {
     in.floorUpButtons[2] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
 
     // elv on floor 1
     st.currentFloor = 1;
@@ -272,8 +272,8 @@ void test_scenario_4(void) {
     updateAndCheckState();
     in.numpad[2] = 0;
     TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(1, st.numpad[2]);
 
     // elv reaches floor 2
@@ -285,8 +285,8 @@ void test_scenario_4(void) {
     updateAndCheckState();
     in.numpad[4] = 0;
     TEST_ASSERT_EQUAL(4, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(0, st.numpad[2]);
     TEST_ASSERT_EQUAL(1, st.numpad[4]);
 
@@ -296,8 +296,8 @@ void test_scenario_4(void) {
     in.doorsSensors[4] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(4, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(0, st.numpad[2]);
     TEST_ASSERT_EQUAL(0, st.numpad[4]);
 }
@@ -311,7 +311,7 @@ void test_scenario_5(void) {
     in.floorDownButtons[1] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
 
     // elv on floor 3
     st.currentFloor = 3;
@@ -321,8 +321,8 @@ void test_scenario_5(void) {
     in.floorDownButtons[2] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[2]);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[2]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
 
     // elv on floor 2
     st.currentFloor = 2;
@@ -333,8 +333,8 @@ void test_scenario_5(void) {
     in.numpad[0] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[2]);
-    TEST_ASSERT_EQUAL(1, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[2]);
+    TEST_ASSERT_EQUAL(1, st.reqDown[1]);
     TEST_ASSERT_EQUAL(1, st.numpad[0]);
 
     // elv reaches floor 1
@@ -347,8 +347,8 @@ void test_scenario_5(void) {
     updateAndCheckState();
     in.numpad[0] = 0;
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[2]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(1, st.numpad[0]);
 
     // elv reaches floor 0
@@ -357,8 +357,8 @@ void test_scenario_5(void) {
     in.doorsSensors[0] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(0, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorDownButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[2]);
+    TEST_ASSERT_EQUAL(0, st.reqDown[1]);
     TEST_ASSERT_EQUAL(0, st.numpad[0]);
 }
 
@@ -371,7 +371,7 @@ void test_scenario_6(void) {
     in.floorUpButtons[1] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(1, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorUpButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqUp[1]);
 
     // elv on floor 1
     st.currentFloor = 1;
@@ -386,8 +386,8 @@ void test_scenario_6(void) {
     in.floorUpButtons[2] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(1, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[1]);
+    TEST_ASSERT_EQUAL(1, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[1]);
     TEST_ASSERT_EQUAL(1, in.numpad[4]);
 
     // elv on floor 2
@@ -399,8 +399,8 @@ void test_scenario_6(void) {
     in.numpad[4] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(4, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[1]);
     TEST_ASSERT_EQUAL(1, st.numpad[4]);
 
     // elv on floor 4
@@ -409,8 +409,8 @@ void test_scenario_6(void) {
     in.doorsSensors[4] = 1;
     updateAndCheckState();
     TEST_ASSERT_EQUAL(4, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[2]);
-    TEST_ASSERT_EQUAL(0, st.floorUpButtons[1]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[2]);
+    TEST_ASSERT_EQUAL(0, st.reqUp[1]);
     TEST_ASSERT_EQUAL(0, st.numpad[4]);
 }
 
