@@ -31,8 +31,13 @@ struct State {
     // remember the state of the buttons
     Bits<NumFloors> floorUpButtons, floorDownButtons, numpad;
 
-    // don't move if currentFloor == nextFloor
-    uint8_t currentFloor, nextFloor;
+    // Function nextState doesn't change currentFloor.
+    // Set currentFloor with new value when the elevator reaches that floor
+    // before calling nextState.
+    // Don't move elevator if currentFloor == nextFloor.
+    uint8_t currentFloor;
+
+    uint8_t nextFloor;
 
     Direction direction;
 };
