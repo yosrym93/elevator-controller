@@ -8,12 +8,13 @@
 class ElevatorController {
 private:
     enum ElevatorState {
-        IDLE,
+        IDLE, // The door is opened when the elevator is IDLE
         GOING_UP,
         GOING_DOWN,
         DOOR_OPENING,
         DOOR_WAITING,
-        DOOR_CLOSING
+        DOOR_CLOSING,
+        DOOR_CLOSED_AT_FLOOR,
     } elevatorState;
 
     NextStopPlanningState<NUM_FLOORS> nextStopPlanningState;
@@ -21,7 +22,6 @@ private:
     LiftController liftController;
     IOController ioController;
 
-    uint8_t currentFloor;
     unsigned long doorWaitBeginningMillis;
 public:
     void init();
