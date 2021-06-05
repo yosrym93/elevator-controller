@@ -7,7 +7,7 @@ Input<NUM_FLOORS> in;
 
 inline void updateAndCheckState(void) {
     uint8_t _floor = st.currentFloor;
-    st = nextState(&in, &st);
+    st = st.getNextState(&in);
     // shouldn't change the currentFloor
     TEST_ASSERT_EQUAL(_floor, st.currentFloor);
 }

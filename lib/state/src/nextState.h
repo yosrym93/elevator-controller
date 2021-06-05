@@ -26,36 +26,39 @@ enum class Direction: uint8_t {
     STOP = 0, UP, DOWN
 };
 
-template<uint8_t NumFloors>
-struct State {
-    // remember the state of the buttons
-    Bits<NumFloors> floorUpButtons, floorDownButtons, numpad;
-
-    // Function nextState doesn't change currentFloor.
-    // Set currentFloor with new value when the elevator reaches that floor
-    // before calling nextState.
-    // Don't move elevator if currentFloor == nextFloor.
-    uint8_t currentFloor;
-
-    uint8_t nextFloor;
-
-    inline Direction getDirection() const {
-        if (nextFloor == currentFloor) {
-            return Direction::STOP;
-        } else if (nextFloor > currentFloor) {
-            return Direction::UP;
-        }
-        
-        return Direction::DOWN;
-    }
-};
-
 // initial state is all zeroed out
 // use it to declare state: State<N> s = ZERO_STRUCT;
 #define ZERO_STRUCT {0}
 
 template<uint8_t NumFloors>
-inline State<NumFloors> nextState(Input<NumFloors> const* in, State<NumFloors> const* curr) {
+struct State {
+    // remember the state of the buttons
+    Bits<NumFloors> floorUpButtons, floorDownButtons, numpad;
+
+    // Function getNextState doesn't change currentFloor.
+    // Set currentFloor with new value when the elevator reaches that floor
+    // before calling getNextState.
+    // Don't move elevator if currentFloor == nextFloor.
+    uint8_t currentFloor;
+    uint8_t nextFloor;
+
+    Direction getDirection() const;
+    State<NumFloors> getNextState(Input<NumFloors> const* input) const;
+};
+
+template<uint8_t NumFloors>
+Direction State<NumFloors>::getDirection() const {
+    if (nextFloor == currentFloor) {
+        return Direction::STOP;
+    } else if (nextFloor > currentFloor) {
+        return Direction::UP;
+    }
+
+    return Direction::DOWN;
+}
+
+template<uint8_t NumFloors>
+State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) const {
     // TODO
     return ZERO_STRUCT;
 }
