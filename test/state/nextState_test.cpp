@@ -583,6 +583,49 @@ void test_scenario_11(void) {
     TEST_ASSERT_EQUAL(0, st.numpad[4]);
 }
 
+void test_scenario_12(void) {
+    // person at 1
+    in.doorsSensors[1] = 1;
+    // pushed up
+    in.floorUpButtons[1] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(1, st.nextFloor);
+
+    // elv between 0,1
+    st.currentFloor = 0;
+    st.isMoving = 1;
+    // person at 1
+    in.doorsSensors[1] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(1, st.nextFloor);
+
+    // elv in 1
+    st.currentFloor = 1;
+    st.isMoving = 0;
+    // person run away
+    // person at 2
+    in.doorsSensors[2] = 1;
+    // pushed up
+    in.floorUpButtons[2] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+
+    // elv between 1,2
+    st.currentFloor = 1;
+    st.isMoving = 1;
+    // person at 2
+    in.doorsSensors[2] = 1;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+
+    // elv in 2
+    st.currentFloor = 2;
+    st.isMoving = 0;
+    // person run away
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+}
+
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_or_bits);
@@ -603,6 +646,7 @@ int main() {
     RUN_TEST(test_scenario_9);
     RUN_TEST(test_scenario_10);
     RUN_TEST(test_scenario_11);
+    RUN_TEST(test_scenario_12);
     UNITY_END();
 
     return 0;
