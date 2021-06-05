@@ -15,7 +15,7 @@ bool DoorController::open() {
     if (stepperController.getCurrentStep() == OPENED_DOOR_STEP) {
         return true;
     }
-    stepperController.step(1);
+    stepperController.step(-1);
     if (stepperController.getCurrentStep() == OPENED_DOOR_STEP) {
         return true;
     } else {
@@ -28,7 +28,7 @@ bool DoorController::close() {
     if (stepperController.getCurrentStep() == CLOSED_DOOR_STEP) {
         return true;
     }
-    stepperController.step(-1);
+    stepperController.step(1);
     if (stepperController.getCurrentStep() == CLOSED_DOOR_STEP) {
         // Assuming door is closed at step 0
         return true;
