@@ -11,8 +11,7 @@ void ElevatorController::init() {
 }
 
 void ElevatorController::run() {
-    ioController.readFloorsInput();
-    ioController.readElevatorNumpad();
+    ioController.readInput();
     ioController.displayInput();
     bool done;
     switch (state) {
