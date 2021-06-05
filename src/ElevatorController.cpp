@@ -12,36 +12,46 @@ void ElevatorController::init() {
 }
 
 void ElevatorController::run() {
+    // Read inputs and update the next stop planning state, which may change our destination.
     auto input = ioController.readInput();
     nextStopPlanningState = nextStopPlanningState.getNextState(&input);
-    bool arrivedAtNextFloor, done;
     switch (elevatorState) {
-        case IDLE:
+        case IDLE: {
             if (nextStopPlanningState.nextFloor != nextStopPlanningState.currentFloor) {
+                // The elevator will start moving, the door should wait for people to get in then close.
                 elevatorState = DOOR_WAITING;
             }
             break;
-        case GOING_UP:
-            arrivedAtNextFloor = liftController.moveUp();
+        }
+        case GOING_UP: {
+            // Keep moving up until the next floor is reached, then move to DOOR_CLOSED_AT_FLOOR state
+            // to check whether we need to continue moving up.
+            bool arrivedAtNextFloor = liftController.moveUp();
             if (arrivedAtNextFloor) {
-                nextStopPlanningState.currentFloor++;
                 elevatorState = DOOR_CLOSED_AT_FLOOR;
             }
             break;
-        case GOING_DOWN:
-            arrivedAtNextFloor = liftController.moveDown();
+        }
+        case GOING_DOWN: {
+            // Keep moving down until the next floor is reached, then move to DOOR_CLOSED_AT_FLOOR state
+            // to check whether we need to continue moving down.
+            bool arrivedAtNextFloor = liftController.moveDown();
             if (arrivedAtNextFloor) {
-                nextStopPlanningState.currentFloor--;
                 elevatorState = DOOR_CLOSED_AT_FLOOR;
             }
             break;
-        case DOOR_OPENING:
-            done = doorController.open();
+        }
+        case DOOR_OPENING: {
+            // Keep opening the door until it is fully opened, then move to IDLE state.
+            bool done = doorController.open();
             if (done) {
                 elevatorState = IDLE;
             }
             break;
-        case DOOR_WAITING:
+        }
+        case DOOR_WAITING: {
+            // Wait for a timeout for being to get in before closing the door. 
+            // Refresh the timeout if obstacles are detected.
             if (doorController.checkObstacles()) {
                 // Refresh wait time if an obstacle is detected
                 doorWaitBeginningMillis = millis();
@@ -50,24 +60,39 @@ void ElevatorController::run() {
                 elevatorState = DOOR_CLOSING;
             }
             break;
-        case DOOR_CLOSING:
-        if (doorController.checkObstacles()) {
-                // Open the door if an obstacle is detected
+        }
+        case DOOR_CLOSING: {
+        // Keep closing the door until it is fully closing, then move to DOOR_CLOSED_AT_FLOOR state
+        // to check whether we should move up or down (or neither if the call is cancelled).
+            if (doorController.checkObstacles()) {
+                // Open the door if an obstacle is detected.
                 elevatorState = DOOR_OPENING;
             }
-            done = doorController.close();
+            bool done = doorController.close();
             if (done) {
                 elevatorState = DOOR_CLOSED_AT_FLOOR;
             }
             break;
-        case DOOR_CLOSED_AT_FLOOR:
+        }
+        case DOOR_CLOSED_AT_FLOOR: {
+            // The elevator arrived at the currentFloor, check whether we need to keep moving
+            // or this is our destination.
             if (nextStopPlanningState.nextFloor < nextStopPlanningState.currentFloor) {
+                // Need to go further down.
+                nextStopPlanningState.isMoving = true;
+                nextStopPlanningState.currentFloor--;
                 elevatorState = GOING_DOWN;
             } else if (nextStopPlanningState.nextFloor > nextStopPlanningState.currentFloor) {
+                // Need to go further up.
+                nextStopPlanningState.isMoving = true;
+                nextStopPlanningState.currentFloor++;
                 elevatorState = GOING_UP;
             } else {
+                // Arrived at the destination.
+                nextStopPlanningState.isMoving = false;
                 elevatorState = DOOR_OPENING;
             }
             break;
+        }
     } 
 }

@@ -8,12 +8,20 @@
 class ElevatorController {
 private:
     enum ElevatorState {
-        IDLE, // The door is opened when the elevator is IDLE
+        // The elevator is IDLE at a floor with the door opened at the currentFloor.
+        IDLE,
+        // The elevator is moving up toward the currentFloor.
         GOING_UP,
+        // The elevator is moving down toward the currentFloor.
         GOING_DOWN,
+        // The elevator door is being opened.
         DOOR_OPENING,
+        // The elevator door is waiting for people to get in before closing.
         DOOR_WAITING,
+        // The elevator door is being closed.
         DOOR_CLOSING,
+        // The elevator is at the currentFloor with the door closed.
+        // The elevator will either open its doors if it reached its destination, or continue moving.
         DOOR_CLOSED_AT_FLOOR,
     } elevatorState;
 
