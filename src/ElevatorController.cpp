@@ -11,7 +11,6 @@ void ElevatorController::init() {
 }
 
 void ElevatorController::run() {
-    delay(500);
     ioController.readInput();
     ioController.displayInput();
     bool done;
