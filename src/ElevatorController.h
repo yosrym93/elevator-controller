@@ -1,6 +1,7 @@
 #pragma once
 #include "DoorController.h"
 #include "LiftController.h"
+#include "IOController.h"
 
 class ElevatorController {
 private:
@@ -16,6 +17,7 @@ private:
     State state;
     DoorController doorController;
     LiftController liftController;
+    IOController ioController;
 
     unsigned long doorWaitBeginningMillis;
 public:
