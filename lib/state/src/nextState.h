@@ -34,7 +34,7 @@ enum class Direction: uint8_t {
 #define ZERO_STRUCT {0}
 
 template<uint8_t NumFloors>
-struct State {
+struct NextStopPlanningState {
     // remember the state of the buttons
     Bits<NumFloors> reqUp, reqDown, numpad;
 
@@ -46,11 +46,11 @@ struct State {
     uint8_t nextFloor;
 
     Direction getDirection() const;
-    State<NumFloors> getNextState(Input<NumFloors> const* input) const;
+    NextStopPlanningState<NumFloors> getNextState(Input<NumFloors> const* input) const;
 };
 
 template<uint8_t NumFloors>
-Direction State<NumFloors>::getDirection() const {
+Direction NextStopPlanningState<NumFloors>::getDirection() const {
     if (nextFloor == currentFloor) {
         return Direction::STOP;
     } else if (nextFloor > currentFloor) {
@@ -131,7 +131,7 @@ inline uint8_t firstDistance(uint8_t x, uint8_t a, uint8_t b, uint8_t c, uint8_t
 }
 
 template<uint8_t NumFloors>
-State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) const {
+NextStopPlanningState<NumFloors> NextStopPlanningState<NumFloors>::getNextState(Input<NumFloors> const* input) const {
     auto numpad = OrBits<NumFloors>(this->numpad, input->numpad);
 
     // reqestedButton = (buttons | input->buttons & input->IR) | numpad
@@ -163,7 +163,7 @@ State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) c
         break;
     }
 
-    return State<NumFloors> {
+    return NextStopPlanningState<NumFloors> {
         reqUp: reqUp,
         reqDown: reqDown,
         numpad: numpad,

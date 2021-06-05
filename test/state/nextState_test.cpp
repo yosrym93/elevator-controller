@@ -2,7 +2,7 @@
 #include <nextState.h>
 
 constexpr size_t NUM_FLOORS = 5;
-State<NUM_FLOORS> st;
+NextStopPlanningState<NUM_FLOORS> st;
 Input<NUM_FLOORS> in;
 
 inline void updateAndCheckState(void) {

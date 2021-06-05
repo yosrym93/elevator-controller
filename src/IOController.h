@@ -1,7 +1,7 @@
 #pragma once
 #include <BitBool.h>
 
-#include "nextstate.h"
+#include "nextState.h"
 #include "constants.h"
 
 #define Bits BitBool

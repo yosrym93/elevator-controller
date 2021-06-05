@@ -7,16 +7,17 @@
 
 class ElevatorController {
 private:
-    enum State {
-        IDLE,
+    enum ElevatorState {
+        IDLE, // The door is opened when the elevator is IDLE
         GOING_UP,
         GOING_DOWN,
         DOOR_OPENING,
         DOOR_WAITING,
-        DOOR_CLOSING
-    };
+        DOOR_CLOSING,
+        DOOR_CLOSED_AT_FLOOR,
+    } elevatorState;
 
-    State state;
+    NextStopPlanningState<NUM_FLOORS> nextStopPlanningState;
     DoorController doorController;
     LiftController liftController;
     IOController ioController;
