@@ -36,7 +36,7 @@ enum class Direction: uint8_t {
 template<uint8_t NumFloors>
 struct State {
     // remember the state of the buttons
-    Bits<NumFloors> floorUpButtons, floorDownButtons, numpad;
+    Bits<NumFloors> reqUp, reqDown, numpad;
 
     // Function getNextState doesn't change currentFloor.
     // Set currentFloor with new value when the elevator reaches that floor
@@ -132,40 +132,42 @@ inline uint8_t firstDistance(uint8_t x, uint8_t a, uint8_t b, uint8_t c, uint8_t
 
 template<uint8_t NumFloors>
 State<NumFloors> State<NumFloors>::getNextState(Input<NumFloors> const* input) const {
-    auto s = State<NumFloors> {
-        // buttons = buttons | input->buttons & input->IR
-        // this way if no one in floor, the button state will be zero
-        floorUpButtons: AndBits<NumFloors>(OrBits<NumFloors>(floorUpButtons, input->floorUpButtons), input->doorsSensors),
-        floorDownButtons: AndBits<NumFloors>(OrBits<NumFloors>(floorDownButtons, input->floorDownButtons), input->doorsSensors),
+    auto numpad = OrBits<NumFloors>(this->numpad, input->numpad);
 
-        numpad: OrBits<NumFloors>(numpad, input->numpad),
-        currentFloor: currentFloor,
-    };
+    // reqestedButton = (buttons | input->buttons & input->IR) | numpad
+    // this way if no one in floor, the button state will be zero
+    auto reqUp = OrBits<NumFloors>(AndBits<NumFloors>(OrBits<NumFloors>(this->reqUp, input->floorUpButtons), input->doorsSensors), numpad);
+    auto reqDown = OrBits<NumFloors>(AndBits<NumFloors>(OrBits<NumFloors>(this->reqDown, input->floorDownButtons), input->doorsSensors), numpad);
 
-    // clear current floor from numpad and floor{Up/Down}Button
-    s.numpad[currentFloor] = 0;
-    s.floorUpButtons[currentFloor] = 0;
-    s.floorDownButtons[currentFloor] = 0;
+    // clear current floor from numpad and requested floors
+    numpad[currentFloor] = 0;
+    reqUp[currentFloor] = 0;
+    reqDown[currentFloor] = 0;
 
-    const auto reqUp = OrBits<NumFloors>(s.numpad, s.floorUpButtons);
-    const auto nextUp   = getIndexOfNextHighBit<NumFloors>(reqUp, s.currentFloor);
-    const auto prevUp   = getIndexOfPrevHighBit<NumFloors>(reqUp, s.currentFloor);
+    // next and prev requested floors
+    const auto nextUp   = getIndexOfNextHighBit<NumFloors>(reqUp, currentFloor);
+    const auto prevUp   = getIndexOfPrevHighBit<NumFloors>(reqUp, currentFloor);
+    const auto nextDown = getIndexOfNextHighBit<NumFloors>(reqDown, currentFloor);
+    const auto prevDown = getIndexOfPrevHighBit<NumFloors>(reqDown, currentFloor);
 
-    const auto reqDown = OrBits<NumFloors>(s.numpad, s.floorDownButtons);
-    const auto nextDown = getIndexOfNextHighBit<NumFloors>(reqDown, s.currentFloor);
-    const auto prevDown = getIndexOfPrevHighBit<NumFloors>(reqDown, s.currentFloor);
-
+    auto nextFloor = this->nextFloor;
     switch (const auto dir = getDirection()) {
     case Direction::UP:
-        s.nextFloor = firstDistance(s.currentFloor, nextUp, nextDown, prevUp, prevDown);
+        nextFloor = firstDistance(currentFloor, nextUp, nextDown, prevUp, prevDown);
         break;
     case Direction::DOWN:
-        s.nextFloor = firstDistance(s.currentFloor, prevDown, prevUp, nextDown, nextUp);
+        nextFloor = firstDistance(currentFloor, prevDown, prevUp, nextDown, nextUp);
         break;
     case Direction::STOP:
-        s.nextFloor = minDistance(s.currentFloor, nextUp, nextDown, prevDown, prevUp);
+        nextFloor = minDistance(currentFloor, nextUp, nextDown, prevDown, prevUp);
         break;
     }
 
-    return s;
+    return State<NumFloors> {
+        reqUp: reqUp,
+        reqDown: reqDown,
+        numpad: numpad,
+        currentFloor: currentFloor,
+        nextFloor: nextFloor,
+    };
 }

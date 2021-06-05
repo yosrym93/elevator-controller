@@ -54,10 +54,10 @@ void IOController::readFloorsInput()
     delayMicroseconds(20);
     disableFloorsInput();
 
-    for (uint8_t i = FLOORS_REGISTERS_SIZE - 1; i >= 0; i--)
+    for (int i = FLOORS_REGISTERS_SIZE - 1; i >= 0; i--)
     {
         digitalWrite(FLOORS_REGISTERS_CLOCK, 0);
-        delayMicroseconds(0.5);
+        delayMicroseconds(20);
 
         floorsUpButton[i] = digitalRead(FLOORS_UP_PIN);
         floorsDownButton[i] = digitalRead(FLOORS_DOWN_PIN);
@@ -125,20 +125,23 @@ void IOController::displayInput()
     {
         Serial.print(bit);
     }
-    Serial.print("\nDown: ");
+    Serial.println("");
+    Serial.print("Down: ");
     for (auto bit : floorsDownButton)
     {
         Serial.print(bit);
     }
-    Serial.print("\nIR: ");
+    Serial.println("");
+    Serial.print("IR: ");
     for (auto bit : floorsIRSensor)
     {
         Serial.print(bit);
     }
-    Serial.println("\nNumpad: ");
+    Serial.println("");
+    Serial.print("Numpad: ");
     for (auto bit : elevatorNumpad)
     {
         Serial.print(bit);
     }
-    Serial.println(" ");
+    Serial.println("");
 }
