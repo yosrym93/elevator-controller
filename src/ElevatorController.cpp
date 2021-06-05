@@ -24,9 +24,13 @@ void ElevatorController::init() {
     state = DOOR_OPENING;
     doorController.init(DOOR_MOTOR_PIN1, DOOR_MOTOR_PIN2, DOOR_MOTOR_PIN3, DOOR_MOTOR_PIN4, US_PING_PIN, US_ECHO_PIN);
     liftController.init(LIFT_MOTOR_PIN1, LIFT_MOTOR_PIN2, LIFT_MOTOR_PIN3, LIFT_MOTOR_PIN4);
+    ioController.init();
 }
 
 void ElevatorController::run() {
+    ioController.read_floors_input();
+    ioController.read_elevator_numpad();
+    ioController.display_input();
     bool  done;
     switch (state) {
         case IDLE:
