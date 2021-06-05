@@ -5,10 +5,10 @@ void IOController::init()
 {
     Serial.println("Initializing IO controller");
 
-    init_floors_input();
+    initFloorsInput();
 }
 
-void IOController::init_floors_input()
+void IOController::initFloorsInput()
 {
     pinMode(FLOORS_REGISTERS_CLOCK, OUTPUT);
     pinMode(FLOORS_REGISTERS_LATCH, OUTPUT);
@@ -18,21 +18,21 @@ void IOController::init_floors_input()
     pinMode(FLOORS_IR_PIN, INPUT);
 }
 
-void IOController::enable_floors_input()
+void IOController::enableFloorsInput()
 {
     digitalWrite(FLOORS_REGISTERS_LATCH, 1);
 }
 
-void IOController::disable_floors_input()
+void IOController::disableFloorsInput()
 {
     digitalWrite(FLOORS_REGISTERS_LATCH, 0);
 }
 
-void IOController::read_floors_input()
+void IOController::readFloorsInput()
 {
-    enable_floors_input();
+    enableFloorsInput();
     delayMicroseconds(20);
-    disable_floors_input();
+    disableFloorsInput();
 
     for (uint8_t i = FLOORS_REGISTERS_SIZE - 1; i >= 0; i--)
     {
@@ -47,7 +47,7 @@ void IOController::read_floors_input()
     }
 }
 
-void IOController::read_elevator_numpad()
+void IOController::readElevatorNumpad()
 {
     int ADC_value = analogRead(ELEVATOR_NUMPAD_PIN);
     if (ADC_value >= (Key_1 - Hysteresis_1) && ADC_value <= (Key_1 + Hysteresis_1))
@@ -88,7 +88,7 @@ void IOController::read_elevator_numpad()
     }*/
 }
 
-void IOController::display_input()
+void IOController::displayInput()
 {
     Serial.print("Up: ");
     for (auto bit : floorsUpButton)

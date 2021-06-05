@@ -36,9 +36,9 @@
 
 class IOController
 {
-    void init_floors_input();
-    void enable_floors_input();
-    void disable_floors_input();
+    void initFloorsInput();
+    void enableFloorsInput();
+    void disableFloorsInput();
 
 public:
     Bits<NumFloors> floorsUpButton;
@@ -48,7 +48,7 @@ public:
     Bits<NumFloors> elevatorNumpad;
 
     void init();
-    void read_floors_input();
-    void read_elevator_numpad();
-    void display_input();
+    void readFloorsInput();
+    void readElevatorNumpad();
+    void displayInput();
 };

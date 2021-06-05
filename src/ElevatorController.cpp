@@ -28,9 +28,9 @@ void ElevatorController::init() {
 }
 
 void ElevatorController::run() {
-    ioController.read_floors_input();
-    ioController.read_elevator_numpad();
-    ioController.display_input();
+    ioController.readFloorsInput();
+    ioController.readElevatorNumpad();
+    ioController.displayInput();
     bool  done;
     switch (state) {
         case IDLE:
