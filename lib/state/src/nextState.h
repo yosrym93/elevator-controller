@@ -39,7 +39,15 @@ struct State {
 
     uint8_t nextFloor;
 
-    Direction direction;
+    inline Direction getDirection() const {
+        if (nextFloor == currentFloor) {
+            return Direction::STOP;
+        } else if (nextFloor > currentFloor) {
+            return Direction::UP;
+        }
+        
+        return Direction::DOWN;
+    }
 };
 
 // initial state is all zeroed out

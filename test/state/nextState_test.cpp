@@ -10,20 +10,6 @@ inline void updateAndCheckState(void) {
     st = nextState(&in, &st);
     // shouldn't change the currentFloor
     TEST_ASSERT_EQUAL(_floor, st.currentFloor);
-
-    switch (st.direction) {
-    case Direction::STOP:
-        TEST_ASSERT_EQUAL(st.nextFloor, st.currentFloor);
-        break;
-    case Direction::UP:
-        TEST_ASSERT_GREATER_THAN(st.nextFloor, st.currentFloor);
-        break;
-    case Direction::DOWN:
-        TEST_ASSERT_LESS_THAN(st.nextFloor, st.currentFloor);
-        break;
-    default:
-        TEST_FAIL_MESSAGE("invalid direction enum value");
-    }
 }
 
 void setUp(void) {
