@@ -39,9 +39,11 @@ struct NextStopPlanningState {
     Bits<NumFloors> reqUp, reqDown, numpad;
 
     // Function getNextState doesn't change currentFloor.
-    // Set currentFloor with new value when the elevator reaches that floor
+    // Set currentFloor with new value when the elevator starts moving towards that floor
     // before calling getNextState.
     // Don't move elevator if currentFloor == nextFloor.
+
+    bool isMoving;
     uint8_t currentFloor;
     uint8_t nextFloor;
 
