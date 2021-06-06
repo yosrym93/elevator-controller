@@ -657,6 +657,36 @@ void test_scenario_13(void) {
     TEST_ASSERT_EQUAL(0, st.numpad[2]);
 }
 
+void test_scenario_14(void) {
+    // elevator at floor 0 
+    st.currentFloor = 0;
+    // person at floor 4 call the elevator
+    in.doorsSensors[4] = 1;
+    in.floorUpButtons[4] = 1;
+
+    updateAndCheckState();
+    in.floorUpButtons[4] = 0;
+    TEST_ASSERT_EQUAL(4, st.nextFloor);
+    TEST_ASSERT_EQUAL(1, st.reqUp[4]);
+   
+    // elv between 1 and 2
+    st.currentFloor = 2;
+    st.isMoving = true;
+
+    // person at floor 4 left
+    in.doorsSensors[4] = 0;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+    TEST_ASSERT_EQUAL(0, in.floorUpButtons[4]);
+
+    // elv in 2
+    st.currentFloor = 2;
+    st.isMoving = false;
+    updateAndCheckState();
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
+}
+
+
 int main() {
     UNITY_BEGIN();
     RUN_TEST(test_or_bits);
@@ -679,6 +709,7 @@ int main() {
     RUN_TEST(test_scenario_11);
     RUN_TEST(test_scenario_12);
     RUN_TEST(test_scenario_13);
+    RUN_TEST(test_scenario_14);
     UNITY_END();
 
     return 0;
