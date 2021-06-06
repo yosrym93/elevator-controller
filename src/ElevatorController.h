@@ -29,6 +29,8 @@ private:
     unsigned long doorWaitBeginningMillis;
 
     void onFloorReached();
+    void enableDoorMotor();
+    void enableLiftMotor();
 public:
     void init();
     void run();

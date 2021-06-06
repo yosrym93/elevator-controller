@@ -6,9 +6,20 @@ void ElevatorController::init() {
 
     nextStopPlanningState = ZERO_STRUCT;
     elevatorState = IDLE;
-    doorController.init(DOOR_MOTOR_PIN1, DOOR_MOTOR_PIN2, DOOR_MOTOR_PIN3, DOOR_MOTOR_PIN4, US_PING_PIN, US_ECHO_PIN);
-    liftController.init(LIFT_MOTOR_PIN1, LIFT_MOTOR_PIN2, LIFT_MOTOR_PIN3, LIFT_MOTOR_PIN4);
+
+    pinMode(MOTORS_SELECTOR_PIN, OUTPUT);
+    
+    doorController.init(MOTOR_PIN1, MOTOR_PIN2, MOTOR_PIN3, MOTOR_PIN4, US_PING_PIN, US_ECHO_PIN);
+    liftController.init(MOTOR_PIN1, MOTOR_PIN2, MOTOR_PIN3, MOTOR_PIN4);
     ioController.init();
+}
+
+void ElevatorController::enableDoorMotor() {
+    digitalWrite(MOTORS_SELECTOR_PIN, DOOR_MOTOR);
+}
+
+void ElevatorController::enableLiftMotor(){
+    digitalWrite(MOTORS_SELECTOR_PIN, LIFT_MOTOR);
 }
 
 void ElevatorController::run() {
@@ -37,6 +48,7 @@ void ElevatorController::run() {
             //Serial.println("GOING_UP");
             // Keep moving up until the next floor is reached, then move to DOOR_CLOSED_AT_FLOOR state
             // to check whether we need to continue moving up.
+            enableLiftMotor();
             bool arrivedAtNextFloor = liftController.moveUp();
             if (arrivedAtNextFloor) {
                 nextStopPlanningState.currentFloor++;
@@ -48,6 +60,7 @@ void ElevatorController::run() {
             //Serial.println("GOING_DOWN");
             // Keep moving down until the next floor is reached, then move to DOOR_CLOSED_AT_FLOOR state
             // to check whether we need to continue moving down.
+            enableLiftMotor();
             bool arrivedAtNextFloor = liftController.moveDown();
             if (arrivedAtNextFloor) {
                 nextStopPlanningState.currentFloor--;
@@ -58,6 +71,7 @@ void ElevatorController::run() {
         case DOOR_OPENING: {
             //Serial.println("DOOR_OPENING");
             // Keep opening the door until it is fully opened, then move to IDLE state.
+            enableDoorMotor();
             bool done = doorController.open();
             if (done) {
                 elevatorState = IDLE;
@@ -81,6 +95,7 @@ void ElevatorController::run() {
             //Serial.println("DOOR_CLOSING");
             // Keep closing the door until it is fully closing, then move to DOOR_CLOSED_AT_FLOOR state
             // to check whether we should move up or down (or neither if the call is cancelled).
+            enableDoorMotor();
             if (doorController.checkObstacles()) {
                 // Open the door if an obstacle is detected.
                 elevatorState = DOOR_OPENING;
