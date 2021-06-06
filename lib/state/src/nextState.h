@@ -47,15 +47,15 @@ struct NextStopPlanningState {
     uint8_t currentFloor;
     uint8_t nextFloor;
 
-    Direction getDirection() const;
     NextStopPlanningState<NumFloors> getNextState(Input<NumFloors> const* input) const;
 };
 
-template<uint8_t NumFloors>
-Direction NextStopPlanningState<NumFloors>::getDirection() const {
+inline Direction getDirection(uint8_t currentFloor, uint8_t nextFloor) {
     if (nextFloor == currentFloor) {
         return Direction::STOP;
-    } else if (nextFloor > currentFloor) {
+    }
+    
+    if (nextFloor > currentFloor) {
         return Direction::UP;
     }
 
@@ -132,6 +132,20 @@ inline uint8_t firstDistance(uint8_t x, uint8_t a, uint8_t b, uint8_t c, uint8_t
     return x;
 }
 
+inline uint8_t safeAddToByte(uint8_t i, int toAdd) {
+    int j = int(i) + toAdd;
+
+    if (j > 0xFF) {
+        return 0xFF;
+    }
+
+    if (j < 0) {
+        return 0;
+    }
+
+    return uint8_t(j);
+}
+
 template<uint8_t NumFloors>
 NextStopPlanningState<NumFloors> NextStopPlanningState<NumFloors>::getNextState(Input<NumFloors> const* input) const {
     auto numpad = OrBits<NumFloors>(this->numpad, input->numpad);
@@ -155,16 +169,27 @@ NextStopPlanningState<NumFloors> NextStopPlanningState<NumFloors>::getNextState(
     const auto prevDown = getIndexOfPrevHighBit<NumFloors>(reqDown, currentFloor);
 
     auto nextFloor = this->nextFloor;
-    switch (const auto dir = getDirection()) {
+    uint8_t movingToFloor;
+
+    switch (const auto dir = getDirection(currentFloor, nextFloor)) {
     case Direction::UP:
         nextFloor = firstDistance(currentFloor, nextUp, nextDown, prevUp, prevDown);
+        movingToFloor = safeAddToByte(currentFloor, +1);
         break;
     case Direction::DOWN:
         nextFloor = firstDistance(currentFloor, prevDown, prevUp, nextDown, nextUp);
+        movingToFloor = safeAddToByte(currentFloor, -1);
         break;
     case Direction::STOP:
         nextFloor = minDistance(currentFloor, nextUp, nextDown, prevDown, prevUp);
+        movingToFloor = currentFloor;
         break;
+    }
+
+    // should stop
+    if (isMoving && getDirection(currentFloor, nextFloor) == Direction::STOP) {
+        // stop at floor im moving to
+        nextFloor = uint8_t(movingToFloor);
     }
 
     return NextStopPlanningState<NumFloors> {
