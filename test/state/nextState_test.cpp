@@ -670,14 +670,14 @@ void test_scenario_14(void) {
     TEST_ASSERT_EQUAL(1, st.reqUp[4]);
    
     // elv between 1 and 2
-    st.currentFloor = 2;
+    st.currentFloor = 1;
     st.isMoving = true;
 
     // person at floor 4 left
     in.doorsSensors[4] = 0;
     updateAndCheckState();
-    TEST_ASSERT_EQUAL(2, st.nextFloor);
-    TEST_ASSERT_EQUAL(0, in.floorUpButtons[4]);
+    //TEST_ASSERT_EQUAL(2, st.nextFloor);
+    TEST_ASSERT_EQUAL(0, st.reqUp[4]);
 
     // elv in 2
     st.currentFloor = 2;
