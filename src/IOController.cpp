@@ -1,41 +1,37 @@
 #include "IOController.h"
 
-#define Key_1 93  // Corresponding ADC value for key 1
-#define Key_2 171 // Corresponding ADC value for key 2
-#define Key_3 236 // Corresponding ADC value for key 3
-#define Key_4 293 // Corresponding ADC value for key 4
-#define Key_5 341 // Corresponding ADC value for key 5
-#define Key_6 384 // Corresponding ADC value for key 6
-#define Key_7 422 // Corresponding ADC value for key 7
-#define Key_8 455 // Corresponding ADC value for key 8
-#define Key_9 485 // Corresponding ADC value for key 9
-
-#define Hysteresis_1 30 // key 1 hysteresis
-#define Hysteresis_2 25 // key 2 hysteresis
-#define Hysteresis_3 20 // key 3 hysteresis
-#define Hysteresis_4 18 // key 4 hysteresis
-#define Hysteresis_5 15 // key 5 hysteresis
-#define Hysteresis_6 14 // key 6 hysteresis
-#define Hysteresis_7 12 // key 7 hysteresis
-#define Hysteresis_8 10 // key 8 hysteresis
-#define Hysteresis_9 8  // key 9 hysteresis
-
 #define SET_BIT(REG, BIT) (REG |= (1 << BIT))
 #define CLEAR_BIT(REG, BIT) (REG &= (~(1 << BIT)))
 
 #define BIT_IS_SET(REG, BIT) (REG & (1 << BIT))
 #define BIT_IS_CLEAR(REG, BIT) (!(REG & (1 << BIT)))
 
+#define INVALID_KEY -1
+
+int keys[KEYPAD_ROW_NUM][KEYPAD_COLUMN_NUM] = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, INVALID_KEY, INVALID_KEY},
+    {INVALID_KEY, 0, INVALID_KEY}
+};
+
 void IOController::init()
 {
+    pinMode(REGISTERS_CLOCK, OUTPUT);
+    initKeypad();
     initFloorsInput();
     init7Segment();
 }
 
+void IOController::initKeypad() {
+    pinMode(KEYPAD_IN_PIN, INPUT);
+    pinMode(KEYPAD_OUT_PIN, OUTPUT);
+    pinMode(KEYPAD_OUT_LATCH, OUTPUT);
+}
+
 void IOController::initFloorsInput()
 {
-    pinMode(FLOORS_REGISTERS_CLOCK, OUTPUT);
-    pinMode(FLOORS_REGISTERS_LATCH, OUTPUT);
+    pinMode(FLOORS_INPUT_LATCH, OUTPUT);
 
     pinMode(FLOORS_UP_PIN, INPUT);
     pinMode(FLOORS_DOWN_PIN, INPUT);
@@ -45,88 +41,113 @@ void IOController::initFloorsInput()
 void IOController::init7Segment()
 {
     pinMode(SEV_SEGMENT_REGISTER_LATCH, OUTPUT);
-    pinMode(SEV_SEGMENT_REGISTER_CLOCK, OUTPUT);
     pinMode(SEV_SEGMENT_REGISTER_DATA, OUTPUT);
 }
 
 void IOController::enableFloorsInput()
 {
-    digitalWrite(FLOORS_REGISTERS_LATCH, 1);
+    digitalWrite(FLOORS_INPUT_LATCH, 1);
 }
 
 void IOController::disableFloorsInput()
 {
-    digitalWrite(FLOORS_REGISTERS_LATCH, 0);
+    digitalWrite(FLOORS_INPUT_LATCH, 0);
 }
+
+void IOController::enableKeypadIn()
+{
+    digitalWrite(KEYPAD_IN_LATCH, 1);
+}
+
+void IOController::disableKeypadIn()
+{
+    digitalWrite(KEYPAD_IN_LATCH, 0);
+}
+
+void IOController::enable7SegmentOutput()
+{
+    digitalWrite(SEV_SEGMENT_REGISTER_LATCH, 0);
+}
+void IOController::disable7SegmentOutput()
+{
+    digitalWrite(SEV_SEGMENT_REGISTER_LATCH, 1);
+}
+
+void IOController::enableKeypadOut()
+{
+    digitalWrite(KEYPAD_OUT_LATCH, 0);
+}
+
+void IOController::disableKeypadOut()
+{
+    digitalWrite(KEYPAD_OUT_LATCH, 1);
+}
+
 
 void IOController::readFloorsInput()
 {
-    enableFloorsInput();
-    delayMicroseconds(20);
     disableFloorsInput();
-
     for (int i = FLOORS_REGISTERS_SIZE - 1; i >= 0; i--)
     {
-        digitalWrite(FLOORS_REGISTERS_CLOCK, 0);
+        digitalWrite(REGISTERS_CLOCK, 0);
         delayMicroseconds(20);
 
         floorsUpButton[i] = digitalRead(FLOORS_UP_PIN);
         floorsDownButton[i] = digitalRead(FLOORS_DOWN_PIN);
         floorsIRSensor[i] = digitalRead(FLOORS_IR_PIN);
 
-        digitalWrite(FLOORS_REGISTERS_CLOCK, 1);
+        digitalWrite(REGISTERS_CLOCK, 1);
     }
+    enableFloorsInput();
 }
 
-void IOController::readElevatorNumpad()
+Bits<KEYPAD_COLS_REGISTER_SIZE> IOController::readKeypadColumns() {
+    disableKeypadIn();
+    Bits<KEYPAD_COLS_REGISTER_SIZE> keypadCols;
+    for (int i = KEYPAD_COLS_REGISTER_SIZE - 1; i >= 0; i--)
+    {
+        digitalWrite(REGISTERS_CLOCK, 0);
+        delayMicroseconds(20);
+        keypadCols[i] = digitalRead(KEYPAD_IN_PIN);
+        digitalWrite(REGISTERS_CLOCK, 1);
+    }
+    enableKeypadIn();
+    return keypadCols;
+}
+
+void IOController::writeKeypadRow(uint8_t rowIndex)
 {
-    // Reset elevator numpad input
-    for (int i = 0; i < NUM_FLOORS; i++)
+    enableKeypadOut();
+    for (int i = KEYPAD_ROWS_REGISTER_SIZE - 1; i >= 0; i--)
     {
-        elevatorNumpad[i] = 0;
+        digitalWrite(REGISTERS_CLOCK, 0);
+        digitalWrite(KEYPAD_OUT_PIN, rowIndex == i);
+        digitalWrite(REGISTERS_CLOCK, 1);
+        // Zero the data pin after shift to prevent bleed through
+        digitalWrite(KEYPAD_OUT_PIN, 0);
     }
-    int ADC_value = analogRead(ELEVATOR_NUMPAD_PIN);
-    if (ADC_value >= (Key_1 - Hysteresis_1) && ADC_value <= (Key_1 + Hysteresis_1))
-    {
-        elevatorNumpad[0] = 1;
+    // Stop shifting
+    digitalWrite(REGISTERS_CLOCK, 0);
+    disableKeypadOut();
+}
+
+void IOController::readKeypad()
+{
+    for(int row = 0; row < KEYPAD_ROW_NUM; row++) {
+        writeKeypadRow(row);
+        auto keypadColumns = readKeypadColumns();
+        for(int col = 0; col < KEYPAD_COLUMN_NUM; col++) {
+            auto key = keys[row][col];
+            if (key == INVALID_KEY) continue;
+            elevatorNumpad[keys[row][col]] = keypadColumns[col];
+        }
     }
-    else if (ADC_value >= (Key_2 - Hysteresis_2) && ADC_value <= (Key_2 + Hysteresis_2))
-    {
-        elevatorNumpad[1] = 1;
-    }
-    else if (ADC_value >= (Key_3 - Hysteresis_3) && ADC_value <= (Key_3 + Hysteresis_3))
-    {
-        elevatorNumpad[2] = 1;
-    }
-    else if (ADC_value >= (Key_4 - Hysteresis_4) && ADC_value <= (Key_4 + Hysteresis_4))
-    {
-        elevatorNumpad[3] = 1;
-    }
-    else if (ADC_value >= (Key_5 - Hysteresis_5) && ADC_value <= (Key_5 + Hysteresis_5))
-    {
-        elevatorNumpad[4] = 1;
-    }
-    else if (ADC_value >= (Key_6 - Hysteresis_6) && ADC_value <= (Key_6 + Hysteresis_6))
-    {
-        elevatorNumpad[5] = 1;
-    }
-    else if (ADC_value >= (Key_7 - Hysteresis_7) && ADC_value <= (Key_7 + Hysteresis_7))
-    {
-        elevatorNumpad[6] = 1;
-    }
-    else if (ADC_value >= (Key_8 - Hysteresis_8) && ADC_value <= (Key_8 + Hysteresis_8))
-    {
-        elevatorNumpad[7] = 1;
-    }
-    /*else if (ADC_value >= (Key_9 - Hysteresis_9) && ADC_value <= (Key_9 + Hysteresis_9))
-    {
-        //Serial.println(9);
-    }*/
+    writeKeypadRow(UINT8_MAX);
 }
 
 Input<NUM_FLOORS> IOController::readInput()
 {
-    readElevatorNumpad();
+    readKeypad();
     readFloorsInput();
     return {floorsUpButton, floorsDownButton, floorsIRSensor, elevatorNumpad};
 }
@@ -157,15 +178,6 @@ void IOController::displayInput()
         Serial.print(bit);
     }
     Serial.println("");
-}
-
-void IOController::enable7SegmentOutput()
-{
-    digitalWrite(SEV_SEGMENT_REGISTER_LATCH, 0);
-}
-void IOController::disable7SegmentOutput()
-{
-    digitalWrite(SEV_SEGMENT_REGISTER_LATCH, 1);
 }
 
 byte IOController::numberToBCD(byte number)
@@ -202,14 +214,14 @@ void IOController::output7Segment(byte output_data)
 
     for (int i = 0; i < SEVEN_SEGMENT_REGISTERS_SIZE; i++)
     {
-        digitalWrite(SEV_SEGMENT_REGISTER_CLOCK, 0);
+        digitalWrite(REGISTERS_CLOCK, 0);
         digitalWrite(SEV_SEGMENT_REGISTER_DATA, seven_segments_value & (1 << i));
-        digitalWrite(SEV_SEGMENT_REGISTER_CLOCK, 1);
+        digitalWrite(REGISTERS_CLOCK, 1);
         // Zero the data pin after shift to prevent bleed through
         digitalWrite(SEV_SEGMENT_REGISTER_DATA, 0);
     }
     // Stop shifting
-    digitalWrite(SEV_SEGMENT_REGISTER_CLOCK, 0);
+    digitalWrite(REGISTERS_CLOCK, 0);
 
     disable7SegmentOutput();
 }

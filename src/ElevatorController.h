@@ -28,6 +28,7 @@ private:
     IOController ioController;
     unsigned long doorWaitBeginningMillis;
 
+    void updateCurrentFloor(uint8_t newFloor);
     void onFloorReached();
     void enableDoorMotor();
     void enableLiftMotor();

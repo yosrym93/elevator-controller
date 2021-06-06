@@ -26,9 +26,7 @@ void ElevatorController::run() {
     // Read inputs and update the next stop planning state, which may change our destination.
     auto input = ioController.readInput();
     nextStopPlanningState = nextStopPlanningState.getNextState(&input);
-    // Output the current floor to the 7 segment
-    ioController.output7Segment(nextStopPlanningState.currentFloor);
-    //ioController.displayInput();
+    // ioController.displayInput();
     // Serial.print("Current floor: ");
     // Serial.print(nextStopPlanningState.currentFloor);
     // Serial.print(" , Next floor: ");
@@ -51,7 +49,7 @@ void ElevatorController::run() {
             enableLiftMotor();
             bool arrivedAtNextFloor = liftController.moveUp();
             if (arrivedAtNextFloor) {
-                nextStopPlanningState.currentFloor++;
+                updateCurrentFloor(nextStopPlanningState.currentFloor + 1);
                 onFloorReached();
             }
             break;
@@ -63,7 +61,7 @@ void ElevatorController::run() {
             enableLiftMotor();
             bool arrivedAtNextFloor = liftController.moveDown();
             if (arrivedAtNextFloor) {
-                nextStopPlanningState.currentFloor--;
+                updateCurrentFloor(nextStopPlanningState.currentFloor - 1);
                 onFloorReached();
             }
             break;
@@ -109,6 +107,11 @@ void ElevatorController::run() {
             break;
         }
     } 
+}
+
+void ElevatorController::updateCurrentFloor(uint8_t newFloor) {
+    nextStopPlanningState.currentFloor = newFloor;
+    ioController.output7Segment(nextStopPlanningState.currentFloor);
 }
 
 void ElevatorController::onFloorReached() {
