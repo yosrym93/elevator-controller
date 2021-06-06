@@ -676,7 +676,7 @@ void test_scenario_14(void) {
     // person at floor 4 left
     in.doorsSensors[4] = 0;
     updateAndCheckState();
-    //TEST_ASSERT_EQUAL(2, st.nextFloor);
+    TEST_ASSERT_EQUAL(2, st.nextFloor);
     TEST_ASSERT_EQUAL(0, st.reqUp[4]);
 
     // elv in 2
