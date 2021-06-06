@@ -4,7 +4,7 @@
 
 ElevatorController elevatorController;
 void setup() {
-	//Serial.begin(9600);
+	Serial.begin(9600);
 	elevatorController.init();
 }
 

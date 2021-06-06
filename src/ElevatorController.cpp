@@ -29,11 +29,11 @@ void ElevatorController::run() {
     // Output the current floor to the 7 segment
     ioController.output7Segment(nextStopPlanningState.currentFloor);
     //ioController.displayInput();
-    /*Serial.print("Current floor: ");
-    Serial.print(nextStopPlanningState.currentFloor);
-    Serial.print(" , Next floor: ");
-    Serial.print(nextStopPlanningState.nextFloor);
-    Serial.println("");*/
+    // Serial.print("Current floor: ");
+    // Serial.print(nextStopPlanningState.currentFloor);
+    // Serial.print(" , Next floor: ");
+    // Serial.print(nextStopPlanningState.nextFloor);
+    // Serial.println("");
     switch (elevatorState) {
         case IDLE: {
             //Serial.println("IDLE");
