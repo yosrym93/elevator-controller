@@ -52,7 +52,7 @@ bool DoorController::checkObstacles() {
     delayMicroseconds(10);
     digitalWrite(pingPin, LOW);
     // Measure the time for the input pulse on the echo pin
-    long duration = pulseIn(echoPin, HIGH);
-    long cm = microsecondsToCentimeters(duration);
-    return cm < OBSTALCE_DISTANCE_THRESHOLD_CM;
+    long durationMicroseconds = pulseIn(echoPin, HIGH);
+    long distanceCM = microsecondsToCentimeters(durationMicroseconds);
+    return distanceCM < OBSTALCE_DISTANCE_THRESHOLD_CM;
 }
