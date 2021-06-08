@@ -40,8 +40,8 @@ bool DoorController::close() {
 long microsecondsToCentimeters(long microseconds) {
     // Speed of sounds = 343 m/s = 0.0343 cm / microseconds = 1 / 29 cm / microseconds
     // Distance (roundtrip) = speed * time = microseconds / 29
-    // Distance (one-way) = micrseconds / 29 / 2
-    return microseconds / 29 / 2;
+    // Distance (one-way) = (micrseconds / 29) / 2
+    return (microseconds / 29) / 2;
 }
 
 bool DoorController::checkObstacles() {
