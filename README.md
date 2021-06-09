@@ -18,8 +18,12 @@ $ sudo apt update &&
 You may install `PlatformIO IDE` extension for VSCode.
 Make sure to disable/uninstall `Arduino` extension before it, if you have it enabled.
 
-# Load in Proteus
-Use hex file `./.pio/build/default/firmware.hex` which is generated after build.
+# Simulation
+- Open proteus project file `.proteus\elevator-controller.pdsprj` using Proteus 8.6.
+- Load the hex file `./.pio/build/default/firmware.hex` which is generated after building into the Arduino Uno component.
+- Download the ultrasonic sensor library from the following link, follow the instructions to place its library files in Proteus's library directory and load its hex file to the ultrasonic sensor:
+https://www.theengineeringprojects.com/2015/02/ultrasonic-sensor-library-proteus.html
+- Run the simulation and have fun.
 
 # Make Targets
 ## Build
